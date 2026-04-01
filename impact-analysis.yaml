@@ -149,7 +149,7 @@ tools:
         fld.FIELD_DATA_TYPE AS field_type,
         fld.FIELD_USE_MODE AS field_usage
       FROM ${IA_LIBRARY}.IAALLREFPF ref
-      LEFT JOIN ${IA_LIBRARY}.IAFIDTL fld
+      LEFT JOIN ${IA_LIBRARY}.IAFILEDTL fld
         ON fld.MEMBER_NAME = ref.OBJECT_NAME
         AND fld.FIELD_NAME_INTERNAL = :field_name
       WHERE ref.REFERENCED_OBJ = :file_name
@@ -185,8 +185,7 @@ tools:
         IAV_DTYP AS data_type,
         IAV_LEN AS field_length,
         IAV_DEC AS decimal_positions,
-        IAV_DIM AS array_dimension,
-        IAV_DSFLD AS ds_field_flag
+        IAV_DIM AS array_dimension
       FROM ${IA_LIBRARY}.IAPGMVARS
       WHERE IAV_MBR = :member_name
       ORDER BY IAV_VAR
