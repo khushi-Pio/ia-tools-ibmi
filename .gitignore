@@ -1,2 +1,5 @@
 .env
 node_modules/
+CLAUDE.md
+.mcp.json
+.claude/

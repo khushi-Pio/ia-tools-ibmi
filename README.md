@@ -9,6 +9,7 @@ Use them with **VS Code GitHub Copilot**, **Claude Code**, or any MCP-compatible
 | File | Description |
 |------|-------------|
 | `impact-analysis.yaml` | 4 MCP tool definitions for iA queries |
+| `AGENTS.md` | AI agent playbook — how to chain tools, interpret results, and ask follow-up questions like a senior IBM i developer |
 | `.vscode/mcp.json` | VS Code MCP server config (auto-detected on open) |
 | `.env.example` | DB2i connection template |
 | `LICENSE` | Apache-2.0 |
@@ -250,6 +251,26 @@ We welcome contributions! Whether it's a new tool, a bug fix, or an improvement 
 9. Review        → Maintainer reviews your PR, may request changes
 10. Merge        → Once approved, maintainer merges into main
 ```
+
+### Keeping your fork updated
+
+After you fork and clone, your copy doesn't automatically get new changes from the original repo. To stay up to date:
+
+**One-time setup** — add the original repo as a remote called `upstream`:
+
+```bash
+git remote add upstream https://github.com/PIO-Anurag-Garg/ia-tools-ibmi.git
+```
+
+**Pull latest changes** whenever you want to sync:
+
+```bash
+git fetch upstream
+git merge upstream/main
+git push origin main        # updates your fork on GitHub too
+```
+
+> **Tip**: GitHub also has a **"Sync fork"** button on your fork's page — click it to pull in upstream changes without using the CLI.
 
 ### PR checklist
 
