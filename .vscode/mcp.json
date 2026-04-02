@@ -2,7 +2,7 @@
   "servers": {
     "ibmi-ia-tools": {
       "type": "http",
-      "url": "http://localhost:3000/mcp"
+      "url": "http://0.0.0.0:3010/mcp"
     }
   }
 }
