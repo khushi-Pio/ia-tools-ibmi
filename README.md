@@ -9,11 +9,9 @@ Use them with **VS Code GitHub Copilot**, **Claude Code**, or any MCP-compatible
 | File | Description |
 |------|-------------|
 | `impact-analysis.yaml` | MCP tool definitions for iA queries |
-| `CLAUDE.md` | Project conventions and Claude Code guidance |
 | `.claude/skills/ia/` | `/ia` skill for Claude Code — query guidance and SQL patterns |
 | `.vscode/mcp.json` | VS Code MCP server config (auto-detected on open) |
 | `.env.example` | DB2i connection template |
-| `archive/FileInfo.md` | Reference for all 35+ iA repository tables (schemas, sample data) |
 | `LICENSE` | Apache-2.0 |
 
 ### `/ia` Skill (for Claude Code)
