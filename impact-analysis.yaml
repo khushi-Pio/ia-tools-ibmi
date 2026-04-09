@@ -1367,3 +1367,48 @@ tools:
         AND (:call_type = '*ALL' OR IVCAL_TYP = :call_type)
       ORDER BY IVCAL_MBR, IVCAL_TYP
       FETCH FIRST :limit ROWS ONLY
+
+  # ── Procedure Parameters — PR/PI signatures ─────────────────────────────
+  ia_procedure_params:
+    name: ia-procedure-params
+    source: ibmi
+    description: >
+      Get the parameter signature of a procedure — parameter names, types,
+      keywords (CONST, VALUE, OPTIONS), and sequence. Shows both PR (prototype)
+      and PI (procedure interface) declarations. Essential for understanding
+      how to call a procedure correctly. Queries IAPRCPARM.
+    parameters:
+      - name: procedure_name
+        type: string
+        description: "Procedure name to look up"
+        required: true
+        minLength: 1
+        maxLength: 256
+      - name: member_name
+        type: string
+        description: "Filter by source member name (optional)"
+        required: false
+        default: "*ALL"
+      - name: limit
+        type: integer
+        description: "Max results (default: 100)"
+        required: false
+        default: 100
+        min: 1
+        max: 1000
+    statement: |
+      SELECT
+        MEMBER_NAME,
+        PROCEDURE_NAME,
+        PR_PI_FLAG AS declaration_type,
+        PARAMETER_SEQ AS param_sequence,
+        PARAMETER_NAME AS param_name,
+        PARM_DATA_TYPE AS data_type,
+        PARM_LENGHT AS param_length,
+        PARM_DEC_POS AS decimal_positions,
+        KEYWORDS
+      FROM ${IA_LIBRARY}.IAPRCPARM
+      WHERE PROCEDURE_NAME = :procedure_name
+        AND (:member_name = '*ALL' OR MEMBER_NAME = :member_name)
+      ORDER BY MEMBER_NAME, PR_PI_FLAG, PARAMETER_SEQ
+      FETCH FIRST :limit ROWS ONLY
