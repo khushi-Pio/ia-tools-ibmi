@@ -18,7 +18,7 @@ Use them with **VS Code GitHub Copilot**, **Claude Code**, or any MCP-compatible
 
 A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to query all 35+ iA tables. Invoke with `/ia` in any Claude Code session. The skill includes table schemas, SQL patterns, and query workflows in its `references/` folder.
 
-## Tools (31 custom + 2 built-in)
+## Tools (42 custom + 2 built-in)
 
 ### Custom iA Tools (defined in `impact-analysis.yaml`)
 
@@ -55,6 +55,22 @@ A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to qu
 | 29 | `ia_object_lookup` | Look up object type, library, and attribute by name |
 | 30 | `ia_file_dependencies` | Find LFs, indexes, and views dependent on a physical file |
 | 31 | `ia_uncompiled_sources` | Find source members without compiled objects (orphaned sources) |
+
+### Advanced Analysis
+
+| # | Tool | Description |
+|---|------|-------------|
+| 32 | `ia_copybook_impact` | Find programs including a copybook via /COPY |
+| 33 | `ia_srvpgm_exports` | List service program exported/imported procedures |
+| 34 | `ia_procedure_xref` | Procedure-level cross-reference (callers/callees) |
+| 35 | `ia_procedure_params` | Get procedure PR/PI parameter signatures |
+| 36 | `ia_cl_jobs` | Detect SBMJOB calls in CL programs |
+| 37 | `ia_variable_ops` | Find variable declarations, assignments, BIFs |
+| 38 | `ia_klist_usage` | Find KLIST/KFLD key list definitions |
+| 39 | `ia_application_area` | List application areas and their objects |
+| 40 | `ia_sql_names` | Map SQL long names to system short names |
+| 41 | `ia_program_files` | List files used by a program with PREFIX details |
+| 42 | `ia_pseudocode` | Get AI-generated pseudocode for a program |
 
 ### Built-in MCP Server Tools
 
@@ -142,13 +158,13 @@ IBM i MCP Server listening on http://localhost:3000
 code .
 ```
 
-VS Code detects `.vscode/mcp.json` and connects to the running MCP server at `http://localhost:3000/mcp`. The 30 iA tools plus built-in SQL tools become available in Copilot Chat.
+VS Code detects `.vscode/mcp.json` and connects to the running MCP server at `http://localhost:3000/mcp`. The 42 iA tools plus built-in SQL tools become available in Copilot Chat.
 
 ### Step 5: Use iA tools in Copilot Chat
 
 1. **Open Copilot Chat**: Press `Ctrl+Alt+I` (Windows/Linux) or `Cmd+Alt+I` (Mac)
 2. **Switch to Agent mode**: Click the mode dropdown at the top of the chat panel and select **"Agent"**
-3. **Verify tools are loaded**: Click the **tools icon** (wrench/hammer) at the top-left of the chat input — you should see the 30 `ia-*` tools plus `execute_sql` and `describe_sql_object` listed under "ibmi-ia-tools"
+3. **Verify tools are loaded**: Click the **tools icon** (wrench/hammer) at the top-left of the chat input — you should see the 42 `ia-*` tools plus `execute_sql` and `describe_sql_object` listed under "ibmi-ia-tools"
 4. **Ask a question** — the agent will automatically pick the right iA tool:
 
 ```

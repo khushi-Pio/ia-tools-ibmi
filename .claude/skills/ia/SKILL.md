@@ -27,6 +27,12 @@ Most iA questions can be answered with a single well-chosen tool. Before calling
 | "Complexity hotspots?" | `ia_code_complexity` (member=*ALL) | All programs ranked by complexity |
 | "Find object named X?" | `ia_object_lookup` | Type/library/attr (supports % wildcards) |
 | "Repository overview?" | `ia_dashboard` | Full inventory stats |
+| "Copybook impact?" | `ia_copybook_impact` | Programs including the copybook |
+| "SRVPGM exports?" | `ia_srvpgm_exports` | Exported/imported procedures |
+| "Procedure callers?" | `ia_procedure_xref` | Procedure-level call graph |
+| "Batch jobs?" | `ia_cl_jobs` | SBMJOB calls in CL programs |
+| "Procedure signature?" | `ia_procedure_params` | PR/PI parameter definitions |
+| "What does X do?" | `ia_pseudocode` | AI-generated program summary |
 
 ### When to Chain (and When NOT to)
 
@@ -44,9 +50,9 @@ Most iA questions can be answered with a single well-chosen tool. Before calling
 
 ## Tool Preference Rule
 
-**Prefer dedicated `ia_*` MCP tools over `execute_sql`.** The repo ships 27 purpose-built tools that are parameter-validated, bounded, and tested. **Must only fall back** to `execute_sql` when no dedicated tool fits (then consult [references/sql-patterns.md](references/sql-patterns.md)).
+**Prefer dedicated `ia_*` MCP tools over `execute_sql`.** The repo ships 38 purpose-built tools that are parameter-validated, bounded, and tested. **Must only fall back** to `execute_sql` when no dedicated tool fits (then consult [references/sql-patterns.md](references/sql-patterns.md)).
 
-## Dedicated Tools (27)
+## Dedicated Tools (38)
 
 ### Discovery — start here
 | Tool | Purpose |
@@ -104,6 +110,21 @@ Most iA questions can be answered with a single well-chosen tool. Before calling
 | `ia_dds_to_ddl_status` | DDS→DDL modernization tracking |
 | `ia_exception_log` | iA parser errors per member |
 
+### Advanced Analysis
+| Tool | Purpose |
+|------|---------|
+| `ia_copybook_impact` | Programs including a copybook via /COPY |
+| `ia_srvpgm_exports` | Service program exported/imported procedures |
+| `ia_procedure_xref` | Procedure-level cross-reference |
+| `ia_procedure_params` | Procedure PR/PI signatures |
+| `ia_cl_jobs` | CL SBMJOB/CALL detection with job queue info |
+| `ia_variable_ops` | Variable declarations, assignments, BIF usage |
+| `ia_klist_usage` | KLIST/KFLD key list definitions |
+| `ia_application_area` | Scoped project areas and their objects |
+| `ia_sql_names` | SQL long/short name mapping |
+| `ia_program_files` | Program file usage with PREFIX/RENAME |
+| `ia_pseudocode` | AI-generated pseudocode summaries |
+
 ### Fallback
 | Tool | Purpose |
 |------|---------|
@@ -137,8 +158,12 @@ Most iA questions can be answered with a single well-chosen tool. Before calling
 | Raw RPG/CL token stream? | `ia_rpg_source_tokens`, `ia_cl_source_tokens` | — |
 | Source code for member X? | `execute_sql` on IAQRPGSRC / IAQCLSRC / IAQDDSSRC | [#16, #17](references/sql-patterns.md) |
 | Logical files over physical file X? | `ia_file_dependencies` | — |
-| Copybook impact? | `execute_sql` on COPYBOOK_MEMBER_DETAIL | [#11](references/sql-patterns.md) |
-| Service program exports? | `execute_sql` on IMPORTED_EXPORTED_PROCEDURE_DETAILS | [#12](references/sql-patterns.md) |
+| Copybook change impact? | `ia_copybook_impact` | — |
+| SRVPGM exports/imports? | `ia_srvpgm_exports` | [#12](references/sql-patterns.md) |
+| Procedure-level callers? | `ia_procedure_xref` | — |
+| Procedure signature? | `ia_procedure_params` | — |
+| Batch job detection? | `ia_cl_jobs` | — |
+| AI program summary? | `ia_pseudocode` | — |
 | Anything else | Find the table in [tables.md](references/tables.md), schema via `describe_sql_object`, query via `execute_sql` |
 
 ## Parameter Rules for Dedicated Tools
