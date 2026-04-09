@@ -1178,3 +1178,48 @@ tools:
         AND (:member_type = '*ALL' OR d.MEMBER_TYPE = :member_type)
       ORDER BY d.MEMBER_TYPE, d.MEMBER_NAME
       FETCH FIRST :limit ROWS ONLY
+
+  # ── Copybook Impact — find programs including a copybook ────────────────
+  ia_copybook_impact:
+    name: ia-copybook-impact
+    source: ibmi
+    description: >
+      Find all source members that include a specific copybook via /COPY or /INCLUDE.
+      Critical for understanding the blast radius of copybook changes — any modification
+      to a copybook affects all including members. Shows the exact line number where
+      the copy directive appears. Queries COPYBOOK_MEMBER_DETAIL.
+    parameters:
+      - name: copybook_name
+        type: string
+        description: "Copybook member name to search for (e.g., CUSTDS, ABORTERR)"
+        required: true
+        minLength: 1
+        maxLength: 10
+      - name: member_type
+        type: string
+        description: "Filter by including member type: *ALL, RPGLE, SQLRPGLE, CBLLE (default: *ALL)"
+        required: false
+        default: "*ALL"
+      - name: limit
+        type: integer
+        description: "Max results (default: 500)"
+        required: false
+        default: 500
+        min: 1
+        max: 5000
+    statement: |
+      SELECT
+        MEMBER_NAME AS including_member,
+        MEMBER_TYPE AS member_type,
+        MEMBER_LIBRARY AS member_library,
+        MEMBER_SOURCE_FILE AS source_file,
+        MEMBER_RRN_NUMBER AS copy_line_number,
+        COPYBOOK_MEMBER_NAME AS copybook_name,
+        COPYBOOK_MEMBER_LIBRARY AS copybook_library,
+        COPYBOOK_SOURCE_FILE AS copybook_source_file,
+        COPYBOOK_DIRECTIVES AS directive
+      FROM ${IA_LIBRARY}.COPYBOOK_MEMBER_DETAIL
+      WHERE COPYBOOK_MEMBER_NAME = :copybook_name
+        AND (:member_type = '*ALL' OR MEMBER_TYPE = :member_type)
+      ORDER BY MEMBER_LIBRARY, MEMBER_NAME
+      FETCH FIRST :limit ROWS ONLY
