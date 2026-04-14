@@ -381,7 +381,7 @@ tools:
     name: ia-object-list
     source: ibmi
     description: >
-      List all objects in the iA repository with metadata: type, library,
+      List all objects in the iA repository with metadata: type, attribute, library,
       source file/member, creation date, and exclusion status.
       Use to discover available objects before running impact analysis.
       Queries OBJECT_DETAILS — the master object inventory.
@@ -389,6 +389,11 @@ tools:
       - name: object_type
         type: string
         description: "Filter: *ALL, *PGM, *SRVPGM, *FILE, *DSPF, *CMD, *DTAARA, *MODULE (default: *ALL)"
+        required: false
+        default: "*ALL"
+      - name: object_attribute
+        type: string
+        description: "Filter by attribute: *ALL, RPGLE, CLLE, RPG, CLP, CLE, PF, LF, DSPF, PRTF (default: *ALL)"
         required: false
         default: "*ALL"
       - name: limit
@@ -400,12 +405,13 @@ tools:
         max: 5000
     statement: |
       SELECT
-        OBJECT_NAME, OBJECT_TYPE, OBJECT_LIBRARY,
+        OBJECT_NAME, OBJECT_TYPE, OBJECT_ATTRIBUTE, OBJECT_LIBRARY,
         SOURCE_FILE, SOURCE_MEMBER,
         CREATION_DATE, EXCLUDED_FLAG
       FROM ${IA_LIBRARY}.OBJECT_DETAILS
       WHERE (:object_type = '*ALL' OR OBJECT_TYPE = :object_type)
-      ORDER BY OBJECT_TYPE, OBJECT_NAME
+        AND (:object_attribute = '*ALL' OR OBJECT_ATTRIBUTE = :object_attribute)
+      ORDER BY OBJECT_TYPE, OBJECT_ATTRIBUTE, OBJECT_NAME
       FETCH FIRST :limit ROWS ONLY
 
   # ── 11. Program Info — program/module metadata ──────────────────────────
