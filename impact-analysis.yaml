@@ -25,6 +25,7 @@ tools:
   ia_where_used:
     name: ia-where-used
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Find every program, service program, command, display file, and logical file
       that references a specific object. Most common impact analysis query.
@@ -67,6 +68,7 @@ tools:
   ia_call_hierarchy:
     name: ia-call-hierarchy
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Generate the call tree for a program — who calls it (CALLERS), what it calls
       (CALLEES), or both. Includes procedure-level detail and call sequence numbers.
@@ -119,6 +121,7 @@ tools:
   ia_field_impact:
     name: ia-field-impact
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Analyze the blast radius of changing a specific field in a database file.
       Returns all programs that reference the file, cross-referenced with field-level usage.
@@ -164,6 +167,7 @@ tools:
   ia_program_variables:
     name: ia-program-variables
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       List all variables declared in a program/module with full type information.
       Includes standalone fields, data structure subfields, indicators, and constants.
@@ -199,6 +203,7 @@ tools:
   ia_data_structures:
     name: ia-data-structures
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Get all data structure definitions in a program, including nested DS, based DS,
       qualified DS, and their subfields with positional info.
@@ -270,6 +275,7 @@ tools:
   ia_subroutines:
     name: ia-subroutines
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       List all subroutines (BEGSR/ENDSR) in a program with usage counts.
       Helps understand internal program structure and identify dead subroutines.
@@ -484,6 +490,7 @@ tools:
   ia_program_detail:
     name: ia-program-detail
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Deep structural analysis of a program — calls, files, subroutines, variables,
       overrides, and call parameters in a single query. Use section parameter to
@@ -617,6 +624,7 @@ tools:
   ia_rpg_source_tokens:
     name: ia-rpg-source-tokens
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Get the token-level analysis of an RPG source member — every word/token
       categorized by the iA parser. This is the deepest level of RPG source
@@ -628,6 +636,12 @@ tools:
         required: true
         minLength: 1
         maxLength: 10
+      - name: offset
+        type: integer
+        description: "Skip first N rows for pagination (default: 0)"
+        required: false
+        default: 0
+        min: 0
       - name: limit
         type: integer
         description: "Max results (default: 2000)"
@@ -640,6 +654,7 @@ tools:
       FROM ${IA_LIBRARY}.IAPGMREF
       WHERE MEMBER_NAME = :member_name
       ORDER BY SOURCE_RRN
+      OFFSET :offset ROWS
       FETCH FIRST :limit ROWS ONLY
 
   # ── 16. CL Source Tokens — token-level CL source analysis ────────────────
@@ -656,6 +671,12 @@ tools:
         required: true
         minLength: 1
         maxLength: 10
+      - name: offset
+        type: integer
+        description: "Skip first N rows for pagination (default: 0)"
+        required: false
+        default: 0
+        min: 0
       - name: limit
         type: integer
         description: "Max results (default: 2000)"
@@ -668,6 +689,7 @@ tools:
       FROM ${IA_LIBRARY}.IACPGMREF
       WHERE MEMBER_NAME = :member_name
       ORDER BY SOURCE_RRN
+      OFFSET :offset ROWS
       FETCH FIRST :limit ROWS ONLY
 
   # ── 17. Dashboard — repository health summary ─────────────────────────────
@@ -1019,7 +1041,7 @@ tools:
     statement: |
       SELECT *
       FROM ${IA_LIBRARY}.IAOBJMAP
-      WHERE OBJECT_NAME LIKE :object_name
+      WHERE RTRIM(OBJECT_NAME) LIKE :object_name
       ORDER BY OBJECT_NAME, OBJECT_TYPE
       FETCH FIRST :limit ROWS ONLY
 
@@ -1344,6 +1366,7 @@ tools:
   ia_variable_ops:
     name: ia-variable-ops
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Find all operations involving a variable — declarations (DCL-DS, DCLVAR),
       assignments (EVAL), comparisons, and BIF usage. Useful for tracing data
@@ -1571,6 +1594,7 @@ tools:
   ia_rpg_source:
     name: ia-rpg-source
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Read the actual RPG source code for a member, line by line.
       Returns source text with line numbers, spec types, and format classification.
@@ -1595,6 +1619,12 @@ tools:
         required: false
         default: "*ALL"
         maxLength: 10
+      - name: offset
+        type: integer
+        description: "Skip first N lines for pagination (default: 0). Use with limit to page through large sources."
+        required: false
+        default: 0
+        min: 0
       - name: limit
         type: integer
         description: "Max source lines to return (default: 5000)"
@@ -1612,12 +1642,14 @@ tools:
         AND (:source_spec = '*ALL' OR SOURCE_SPEC = :source_spec)
         AND (:library_name = '*ALL' OR LIBRARY_NAME = :library_name)
       ORDER BY LIBRARY_NAME, SOURCE_RRN
+      OFFSET :offset ROWS
       FETCH FIRST :limit ROWS ONLY
 
   # ── 42. RPG Source Search — cross-member keyword search ──────────────────
   ia_rpg_source_search:
     name: ia-rpg-source-search
     source: ibmi
+    maxDisplayRows: 1000
     description: >
       Search across all RPG source members for lines containing a keyword or pattern.
       Case-insensitive. Use this to find embedded SQL table references, API calls
