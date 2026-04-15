@@ -17,7 +17,7 @@ Most iA questions can be answered with a single well-chosen tool. Before calling
 
 | User Intent | Single Best Tool | Returns |
 |-------------|------------------|---------|
-| "What uses X?" | `ia_where_used` | All referencing objects |
+| "What uses X?" | `ia_where_used` | Referencing objects with library, usage type, file usage |
 | "Impact of field change?" | `ia_field_impact` | Affected programs + usage type |
 | "LFs/views over file X?" | `ia_file_dependencies` | All dependent logical files, indexes, views |
 | "Tell me about program X" | `ia_program_detail` (section=*ALL) | Calls, files, subs, vars, overrides — ALL in one query |
@@ -269,6 +269,27 @@ FETCH FIRST 10000 ROWS ONLY
 - **`*DSPF`** = user-facing screen impact — flag prominently
 - **Empty results** are suspicious — object may be invoked by job scheduler or external system
 - Always: **summarize by object type**, count references, state risk level, suggest a concrete next step
+
+### `REFERENCE_SOURCE` column (`ia_where_used`, `IAALLREFPF`)
+
+| Value | Meaning |
+|-------|---------|
+| `O` | Referenced by **object** — the dependency was detected from the compiled object (DSPPGMREF-style) |
+| `S` | Referenced by **source** — the dependency was detected by parsing the source code |
+| ` ` (blank) | Source not applicable (e.g., binding directory entries) |
+
+### `REFERENCE_USAGE` column (`ia_where_used`, `ia_object_references`, `IAALLREFPF`)
+
+| Value | Meaning |
+|-------|---------|
+| `I` | **Implicit** — bound indirectly via a binding directory (not a direct link) |
+| `E` | **Explicit** — direct reference (e.g., direct bind or call) |
+| ` ` (blank) | Not applicable for this reference type |
+
+### `FILE_USAGE` column (`ia_where_used`, `ia_field_impact`, `ia_object_references`, `IAALLREFPF`)
+
+Populated only for `*FILE` references; blank for other object types (e.g., `*SRVPGM`, `*MODULE`).
+Indicates how the program uses the file (input, output, update, etc.).
 
 ## References
 

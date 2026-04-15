@@ -52,11 +52,15 @@ tools:
         max: 5000
     statement: |
       SELECT DISTINCT
+        LIBRARY_NAME AS using_library,
         OBJECT_NAME AS using_object,
         OBJECT_TYPE AS using_type,
         OBJECT_ATTR AS using_attr,
         REFERENCED_OBJ AS referenced_object,
         REFERENCED_OBJTYP AS referenced_type,
+        REFERENCED_OBJLIB AS referenced_library,
+        REFERENCED_OBJUSG AS reference_usage,
+        FILE_USAGES AS file_usage,
         MAPED_FROM AS reference_source
       FROM ${IA_LIBRARY}.IAALLREFPF
       WHERE REFERENCED_OBJ = :object_name
@@ -149,9 +153,13 @@ tools:
         max: 5000
     statement: |
       SELECT DISTINCT
+        ref.LIBRARY_NAME AS affected_library,
         ref.OBJECT_NAME AS affected_object,
         ref.OBJECT_TYPE AS object_type,
         ref.OBJECT_ATTR AS object_attr,
+        ref.REFERENCED_OBJLIB AS file_library,
+        ref.REFERENCED_OBJUSG AS reference_usage,
+        ref.FILE_USAGES AS file_usage,
         ref.MAPED_FROM AS reference_type,
         fld.FIELD_DATA_TYPE AS field_type,
         fld.FIELD_USE_MODE AS field_usage
@@ -1838,12 +1846,15 @@ tools:
         max: 5000
     statement: |
       SELECT DISTINCT
+        LIBRARY_NAME AS source_library,
         OBJECT_NAME AS source_object,
         OBJECT_TYPE AS source_type,
         OBJECT_ATTR AS source_attr,
         REFERENCED_OBJ AS referenced_object,
         REFERENCED_OBJTYP AS referenced_type,
         REFERENCED_OBJLIB AS referenced_library,
+        REFERENCED_OBJUSG AS reference_usage,
+        FILE_USAGES AS file_usage,
         MAPED_FROM AS reference_source
       FROM ${IA_LIBRARY}.IAALLREFPF
       WHERE OBJECT_NAME = :object_name
