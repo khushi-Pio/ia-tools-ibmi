@@ -1791,9 +1791,9 @@ tools:
     parameters:
       - name: member_name
         type: string
-        description: "Member name to look up (e.g., ORDENT00). Use % for wildcards (e.g., ORD%)."
-        required: true
-        minLength: 1
+        description: "Member name to look up (e.g., ORDENT00). Use % for wildcards (e.g., ORD%). Omit to list all members (defaults to %)."
+        required: false
+        default: "%"
         maxLength: 10
       - name: source_file
         type: string
