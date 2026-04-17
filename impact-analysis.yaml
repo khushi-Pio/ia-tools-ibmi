@@ -214,7 +214,9 @@ tools:
     maxDisplayRows: 1000
     description: >
       Get all data structure definitions in a program, including nested DS, based DS,
-      qualified DS, and their subfields with positional info.
+      qualified DS, and their subfields with positional info. Returns a ds_type column
+      (E=externally defined, I=internally defined, B=based) so callers can filter
+      internal vs external DS.
       Queries IAPGMDS — parsed from D-specs and free-format DCL-DS.
     parameters:
       - name: member_name
@@ -233,6 +235,7 @@ tools:
     statement: |
       SELECT
         DATASTR_NAME AS ds_name,
+        DATASTR_TYPE AS ds_type,
         DS_FLD_NAME AS field_name,
         DS_FLD_TYPE AS field_type,
         FROM_LEN_FLD AS from_position,
