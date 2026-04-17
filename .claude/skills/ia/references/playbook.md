@@ -31,6 +31,7 @@
 | Unknown internal structure | `ia_data_structures`, `ia_subroutines` | Inspect DS layouts and subroutine usage |
 | Suspect file routing | `ia_file_overrides`, `ia_override_chain` | Detect OVRDBF redirection |
 | Stale / stale-looking object | `ia_object_lifecycle` | Check last-used date and days-used count |
+| Large or rarely-used objects (capacity/cleanup) | `ia_obj_size` | Rank by size, filter by usage_category (Never/Rare) |
 | High-risk program to refactor | `ia_code_complexity` | Get IF/DO/SQL/GOTO counts and line totals |
 | Circular call suspicion | `ia_circular_deps` | Detect two-way call pairs |
 | Cleanup candidates | `ia_unused_objects` | Objects with zero references |

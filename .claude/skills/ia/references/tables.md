@@ -22,6 +22,7 @@ For full column details on any table, run:
 | `IAPGMINF` | Program/SRVPGM description: modules, source, compile dates | PGM_NAME, MOD_NAME, SRC_FILE, SRC_MBR, MOD_CRTDATE, SRC_UPDDATE, TGT_RLS | Source location, compile status, module composition |
 | `IAOBJMAP` | Compiled object → source member mapping | OBJECT_NAME, OBJECT_TYPE, MEMBER_LIBR, MEMBER_SRCF, MEMBER_NAME, MEMBER_TYPE | Find source for a compiled object |
 | `OBJECT_DETAILS` | Full object inventory (DSPOBJD-level) | OBJECT_NAME, OBJECT_TYPE, OBJECT_SIZE, LASTUSED_DATE, DAYS_USED_COUNT, NO_OF_DEPEND | Object metadata, stale objects, size analysis |
+| `IAOBJUSGDP` (IA_OBJECT_USAGE_SUMMARY_DETAIL) | Object size + usage summary with category buckets | OBJECT_NAME, OBJECT_LIBRARY, OBJECT_TYPE, OBJECT_SIZE, OBJECT_USAGE_CATEGORY (Never/Rare/…), DAYS_USED_COUNT, LAST_USED_DATE | Capacity planning, cleanup candidates — used by `ia_obj_size` |
 | `IASRCMBRID` | Source member registry with surrogate IDs and code metrics | MBR_SUR_ID, MEMBER_NAME, MEMBER_TYPE, MBR_TTL_LOC, MBR_CMT_LOC | Member ID resolution, code size metrics |
 | `MEMBERLIST_DETAILS` (sys: IAMEMBER) | Source member inventory (census of all members) | MEMBER_NAME, SOURCE_FILE, MEMBER_TYPE, NUMBER_OF_RECORD, MBR_CHANGED_DATE | Member existence check, inventory, stale member detection (use `ia_member_lookup`) |
 

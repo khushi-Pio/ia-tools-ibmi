@@ -1906,3 +1906,76 @@ tools:
         AND (:member_library = '*ALL' OR MEMBER_LIBRARY = :member_library)
       ORDER BY MEMBER_RRN_NUMBER
       FETCH FIRST :limit ROWS ONLY
+
+  # ── 47. Object Size — size and usage metrics (lookup or ranking) ──────────
+  ia_obj_size:
+    name: ia-obj-size
+    source: ibmi
+    description: >
+      Object size and usage metrics from IAOBJUSGDP. Works in two modes:
+      (1) Lookup — supply object_name (+ optional library/type) for a specific
+      object's size, usage category, and dates. (2) Ranking — leave filters
+      as *ALL and use min_size / usage_category to find the largest or
+      rarely-used objects for capacity planning and cleanup. Returns
+      OBJECT_SIZE (bytes), OBJECT_USAGE_CATEGORY (e.g. Never, Rare),
+      DAYS_USED_COUNT, LAST_USED_DATE, CREATED_DATE, CHANGE_DATE, and text.
+      Results are sorted by size descending. Queries IAOBJUSGDP.
+    parameters:
+      - name: object_name
+        type: string
+        description: "Object name, or *ALL to scan (default: *ALL)"
+        required: false
+        default: "*ALL"
+        maxLength: 10
+      - name: object_library
+        type: string
+        description: "Object library, or *ALL for all libraries (default: *ALL)"
+        required: false
+        default: "*ALL"
+        maxLength: 10
+      - name: object_type
+        type: string
+        description: "Object type (e.g., *PGM, *FILE, *SRVPGM), or *ALL (default: *ALL)"
+        required: false
+        default: "*ALL"
+        maxLength: 10
+      - name: usage_category
+        type: string
+        description: "Filter by usage category (e.g., Never, Rare), or *ALL (default: *ALL)"
+        required: false
+        default: "*ALL"
+        maxLength: 20
+      - name: min_size
+        type: integer
+        description: "Minimum object size in bytes (default: 0)"
+        required: false
+        default: 0
+        min: 0
+      - name: limit
+        type: integer
+        description: "Max results (default: 200)"
+        required: false
+        default: 200
+        min: 1
+        max: 5000
+    statement: |
+      SELECT
+        OBJECT_LIBRARY,
+        OBJECT_NAME,
+        OBJECT_TYPE,
+        OBJECT_ATTRIBUTE,
+        OBJECT_SIZE,
+        OBJECT_TEXT,
+        CREATED_DATE,
+        CHANGE_DATE,
+        LAST_USED_DATE,
+        DAYS_USED_COUNT,
+        OBJECT_USAGE_CATEGORY
+      FROM ${IA_LIBRARY}.IAOBJUSGDP
+      WHERE (:object_name    = '*ALL' OR OBJECT_NAME    = :object_name)
+        AND (:object_library = '*ALL' OR OBJECT_LIBRARY = :object_library)
+        AND (:object_type    = '*ALL' OR OBJECT_TYPE    = :object_type)
+        AND (:usage_category = '*ALL' OR OBJECT_USAGE_CATEGORY = :usage_category)
+        AND OBJECT_SIZE >= :min_size
+      ORDER BY OBJECT_SIZE DESC
+      FETCH FIRST :limit ROWS ONLY

@@ -54,6 +54,7 @@ body:
         - ia_rpg_source_stats
         - ia_member_lookup
         - ia_object_references
+        - ia_obj_size
         - execute_sql
         - describe_sql_object
         - Other (specify below)
