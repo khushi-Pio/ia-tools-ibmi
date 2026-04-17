@@ -33,7 +33,7 @@ A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to qu
 | 6 | `ia_call_parameters` | Parameters passed at each external call site |
 | 7 | `ia_subroutines` | BEGSR/EXSR details with usage counts |
 | 8 | `ia_file_overrides` | OVRDBF statements (real file routing) |
-| 9 | `ia_file_fields` | Field-level metadata for a database file |
+| 9 | `ia_file_fields` | Field-level metadata for a database file (names, types, lengths, key sequence, reference chain) |
 | 10 | `ia_object_list` | Repository inventory filtered by object type and attribute |
 | 11 | `ia_program_info` | Program/module metadata (source, compile info) |
 | 12 | `ia_program_summary` | Quick program overview with compile info and complexity |

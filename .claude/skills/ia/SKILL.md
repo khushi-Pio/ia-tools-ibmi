@@ -155,7 +155,7 @@ FETCH FIRST 10000 ROWS ONLY
 ### Files & overrides
 | Tool | Purpose |
 |------|---------|
-| `ia_file_fields` | Field-level metadata for a database file (richer than DSPFFD) |
+| `ia_file_fields` | Field-level metadata for a database file: names, aliases, types, lengths, key sequence, reference chain (richer than DSPFFD) |
 | `ia_file_dependencies` | Logical files, indexes, views dependent on a physical file (IADSPDBR) |
 | `ia_file_overrides` | OVRDBF statements — real file routing vs. declared F-spec |
 | `ia_override_chain` | Chained OVRDBF dependencies (A→B→C) |

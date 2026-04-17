@@ -376,9 +376,9 @@ tools:
     name: ia-file-fields
     source: ibmi
     description: >
-      Get field-level metadata for a database file: internal names, data types,
-      reference files, usage mode, and record formats. Richer than DSPFFD because
-      it includes iA parsed cross-reference data. Queries IAFILEDTL.
+      Get field-level metadata for a database file: internal names, aliases, data types,
+      lengths, key field sequence, reference field chain, usage mode, and record formats.
+      Richer than DSPFFD because it includes iA parsed cross-reference data. Queries IAFILEDTL.
     parameters:
       - name: file_name
         type: string
@@ -396,11 +396,20 @@ tools:
     statement: |
       SELECT
         FILE_NAME,
+        FILE_TYPE AS file_type,
+        RECORD_FORMAT AS record_format,
         FIELD_NAME_INTERNAL AS internal_name,
+        FIELD_NAME_ALIAS AS field_alias,
         FIELD_DATA_TYPE AS data_type,
-        REF_FILE AS reference_file,
+        FIELD_LENGTH AS field_length,
+        FIELD_DEC_POS AS decimal_positions,
+        KEY_FIELD AS key_field,
+        NO_OF_KEY_FIELDS AS no_of_key_fields,
         FIELD_USE_MODE AS usage_mode,
-        RECORD_FORMAT AS record_format
+        REF_FILE AS reference_file,
+        REF_LIB AS reference_library,
+        REF_RCDFMT AS reference_format,
+        REF_FIELD AS reference_field
       FROM ${IA_LIBRARY}.IAFILEDTL
       WHERE FILE_NAME = :file_name
       ORDER BY FIELD_NAME_INTERNAL
