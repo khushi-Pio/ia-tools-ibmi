@@ -51,7 +51,7 @@ FETCH FIRST 200 ROWS ONLY
 ```
 
 ### #4 Field Impact (blast radius of changing a field)
-**→ Use `ia_field_impact`** — returns `impact_type`: NEEDS_CHANGE (field in RPG or CL source), NEEDS_RECOMPILE (implicit access or *SRVPGM), STRUCTURAL (*FILE/*DSPF structural dependency)
+**→ Use `ia_file_field_impact_analysis`** — returns `impact_type`: NEEDS_CHANGE (field in RPG or CL source), NEEDS_RECOMPILE (implicit access or *SRVPGM), STRUCTURAL (*FILE/*DSPF structural dependency)
 **→ For full blast radius, also call `ia_file_dependencies` + `ia_find_object_usages` per LF (see QF-1)**
 ```sql
 SELECT DISTINCT ref.OBJECT_NAME AS affected_object, ref.OBJECT_TYPE,

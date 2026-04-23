@@ -12,7 +12,7 @@ This reference documents optimal tool sequences for common queries. Follow these
 
 **Standard 3-tool chain (always run all steps, then synthesize):**
 ```
-1. ia_field_impact(file_name="CUSTMAST", field_name="CUSTNO", limit=500)
+1. ia_file_field_impact_analysis(file_name="CUSTMAST", field_name="CUSTNO", limit=500)
    → Direct PF references: *PGM, *SRVPGM, *DSPF, *FILE
    → impact_type: NEEDS_CHANGE / NEEDS_RECOMPILE / STRUCTURAL
 
@@ -307,7 +307,7 @@ execute_sql → SQL with SOURCE_SPEC filter (P=procedures, D=definitions, F=file
 
 **Single query:**
 ```
-ia_field_impact(field_name="ORDAMT", file_name="*ALL", limit=500)
+ia_file_field_impact_analysis(field_name="ORDAMT", file_name="*ALL", limit=500)
 ```
 
 **Only add** `ia_program_variables` for specific programs where you need to see all variables, not just the target field.
@@ -372,7 +372,7 @@ User Question
     ├─► "What uses X?" ──────────► ia_find_object_usages (single call)
     │                              └─► Chain ia_call_hierarchy ONLY if *SRVPGM in results
     │
-    ├─► "Impact of changing X?" ─► ia_field_impact (single call)
+    ├─► "Impact of changing X?" ─► ia_file_field_impact_analysis (single call)
     │                              └─► Chain ia_find_object_usages ONLY for *SRVPGM amplifiers
     │
     ├─► "What does X call?" ─────► ia_call_hierarchy direction=called (single call)

@@ -18,7 +18,7 @@ Most iA questions can be answered with a single well-chosen tool. Before calling
 | User Intent | Single Best Tool | Returns |
 |-------------|------------------|---------|
 | "What uses X?" | `ia_find_object_usages` | Referencing objects with library, usage type, file usage |
-| "Impact of field change?" | `ia_field_impact` | Affected programs + impact_type (NEEDS_CHANGE / NEEDS_RECOMPILE) + field metadata |
+| "Impact of field change?" | `ia_file_field_impact_analysis` | Affected programs + impact_type (NEEDS_CHANGE / NEEDS_RECOMPILE) + field metadata |
 | "LFs/views over file X?" | `ia_file_dependencies` | All dependent logical files, indexes, views |
 | "Tell me about program X" | `ia_program_detail` (section=*ALL) | Calls, files, subs, vars, overrides — ALL in one query |
 | "Call tree for X?" | `ia_call_hierarchy` | Callers + callees |
@@ -85,7 +85,7 @@ FETCH FIRST 10000 ROWS ONLY
 - "Show file declarations" → Use SQL with `SOURCE_SPEC = 'F'`
 - "Show data definitions" → Use SQL with `SOURCE_SPEC = 'D'`
 
-**For other tools (ia_find_object_usages, ia_field_impact, etc.):**
+**For other tools (ia_find_object_usages, ia_file_field_impact_analysis, etc.):**
 - If results hit the limit, tell user: "Showing first N results. There may be more — increase limit?"
 - **If you anticipate >100 rows upfront:** Skip the dedicated tool. Use `execute_sql` directly with the SQL pattern from [references/sql-patterns.md](references/sql-patterns.md). This avoids truncation surprises.
 
@@ -94,7 +94,7 @@ FETCH FIRST 10000 ROWS ONLY
 **DO chain** when you see `*SRVPGM` in results — service programs are amplifiers; check what binds to them.
 
 **DO auto-chain for field impact (run all 3 steps, then synthesize into one response):**
-1. `ia_field_impact(file_name=X, field_name=Y)` → direct references to the PF (*PGM, *SRVPGM, *DSPF, *FILE); classified as NEEDS_CHANGE / NEEDS_RECOMPILE / STRUCTURAL
+1. `ia_file_field_impact_analysis(file_name=X, field_name=Y)` → direct references to the PF (*PGM, *SRVPGM, *DSPF, *FILE); classified as NEEDS_CHANGE / NEEDS_RECOMPILE / STRUCTURAL
 2. `ia_file_dependencies(file_name=X)` → LFs / indexes / views over the PF (STRUCTURAL impacts). If none found, stop here.
 3. `ia_find_object_usages(object_name=<each_LF>)` [run in parallel for multiple LFs] → programs/objects using those LFs
 
@@ -143,7 +143,7 @@ Present as one response grouped by object_type with three sections:
 | `ia_find_object_usages` | Broad where-used: all objects referencing `object_name` (optional type + library filter) |
 | `ia_object_references` | Inverse of ia_find_object_usages: what an object references/contains (modules in SRVPGM, SRVPGMs in BNDDIR, files used) |
 | `ia_reference_count` | Lightweight: counts of references grouped by type |
-| `ia_field_impact` | Field-level blast radius: programs affected if field X in file Y changes |
+| `ia_file_field_impact_analysis` | Field-level blast radius: programs affected if field X in file Y changes |
 
 ### Call graph
 | Tool | Purpose |
@@ -218,7 +218,7 @@ Present as one response grouped by object_type with three sections:
 | How many refs to X? | `ia_reference_count` | — |
 | What does X call / who calls X? | `ia_call_hierarchy` | [#2, #3](references/sql-patterns.md) |
 | Params passed at each call site? | `ia_call_parameters` | — |
-| Impact of changing field F in file X? | `ia_field_impact` | [#4](references/sql-patterns.md) |
+| Impact of changing field F in file X? | `ia_file_field_impact_analysis` | [#4](references/sql-patterns.md) |
 | Variables in program X? | `ia_program_variables` | [#5](references/sql-patterns.md) |
 | Data structures in program X? | `ia_data_structures` | — |
 | Subroutines in program X? | `ia_subroutines` | — |
@@ -297,7 +297,7 @@ Present as one response grouped by object_type with three sections:
 | `E` | **Explicit** — direct reference (e.g., direct bind or call) |
 | ` ` (blank) | Not applicable for this reference type |
 
-### `FILE_USAGE` column (`ia_find_object_usages`, `ia_field_impact`, `ia_object_references`, `IAALLREFPF`)
+### `FILE_USAGE` column (`ia_find_object_usages`, `ia_file_field_impact_analysis`, `ia_object_references`, `IAALLREFPF`)
 
 Populated only for `*FILE` references; blank for other object types (e.g., `*SRVPGM`, `*MODULE`).
 Indicates how the program uses the file (input, output, update, etc.).

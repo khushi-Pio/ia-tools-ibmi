@@ -23,7 +23,7 @@
 | `*PGM` or `*SRVPGM` names | `ia_call_hierarchy` (SQL #2/#3) | Understand where they sit in execution chain |
 | `*SRVPGM` specifically | `ia_find_object_usages` on that SRVPGM (SQL #1) | Measure cascade — how many programs bind to it |
 | Many refs, just need count | `ia_reference_count` | Lightweight tally grouped by type |
-| `*FILE` names | `ia_field_impact` for specific fields (SQL #4) | Drill into field-level dependencies |
+| `*FILE` names | `ia_file_field_impact_analysis` for specific fields (SQL #4) | Drill into field-level dependencies |
 | `*FILE` (physical) | `execute_sql` on IADSPDBR (SQL #8) | Find logical files/views built over it |
 | `*DSPF` names | `ia_find_object_usages` on display file (SQL #1) | Find which programs present that screen |
 | Programs with null field_usage | `ia_program_variables` (SQL #5) | Confirm whether they actually use the field |
@@ -61,7 +61,7 @@ Call `ia_find_object_usages` → Group by `using_type`, count each → Flag `*SR
 
 ### P2: "What if I change field F in file X?" (Field Impact)
 **Always run all 3 steps, then synthesize:**
-1. `ia_field_impact(file_name=X, field_name=F)` → direct PF references: *PGM, *SRVPGM, *DSPF, *FILE classified by impact_type
+1. `ia_file_field_impact_analysis(file_name=X, field_name=F)` → direct PF references: *PGM, *SRVPGM, *DSPF, *FILE classified by impact_type
 2. `ia_file_dependencies(file_name=X)` → LFs / indexes / views over PF (STRUCTURAL — must be rebuilt)
 3. `ia_find_object_usages` on each LF found in step 2 → programs using those LFs (also need change/recompile)
 
@@ -77,10 +77,10 @@ Call `ia_call_hierarchy` with `direction=BOTH` → Present in two sections: CALL
 Call `ia_program_variables` → Group: standalone fields, DS subfields (likely DB field refs), indicators, arrays → Flag variable names matching DB patterns (short uppercase like CUSTNO, ORDNUM) → For full DS layouts, chain `ia_data_structures`.
 
 ### P5: "Retire/delete X" (Full Retirement)
-`ia_find_object_usages` for all refs → If ANY refs exist, warn immediately → `ia_call_hierarchy` on key programs to assess depth → `ia_field_impact` on critical fields → Synthesize risk: "HIGH/MODERATE/LOW — N objects, M service programs, D display files."
+`ia_find_object_usages` for all refs → If ANY refs exist, warn immediately → `ia_call_hierarchy` on key programs to assess depth → `ia_file_field_impact_analysis` on critical fields → Synthesize risk: "HIGH/MODERATE/LOW — N objects, M service programs, D display files."
 
 ### P6: "Is it safe to modify X?" (Safety Assessment)
-`ia_find_object_usages` or `ia_field_impact` depending on object vs field → Count refs → Apply risk rubric → Check for `*SRVPGM` amplifiers → For code-level risk, add `ia_code_complexity` → State verdict explicitly with evidence.
+`ia_find_object_usages` or `ia_file_field_impact_analysis` depending on object vs field → Count refs → Apply risk rubric → Check for `*SRVPGM` amplifiers → For code-level risk, add `ia_code_complexity` → State verdict explicitly with evidence.
 
 ### P7: "Logical files over physical X?" (File Dependencies)
 `execute_sql` on IADSPDBR (SQL#8) → Interpret WHTYPE: D=data, I=access path, V=SQL VIEW, C=constraint → Chain `ia_find_object_usages` on each logical file to find programs referencing them.
@@ -152,7 +152,7 @@ Call `ia_program_variables` → Group: standalone fields, DS subfields (likely D
 5. **Batch your thinking.** If results show 5 SRVPGMs, don't call `ia_find_object_usages` on each one individually — ask the user which ones matter first.
 6. **Respect the 80/20 rule.** 80% of user questions can be answered with these tools in 1 call:
    - `ia_find_object_usages` — what uses X?
-   - `ia_field_impact` — what if I change field F?
+   - `ia_file_field_impact_analysis` — what if I change field F?
    - `ia_call_hierarchy` — call tree for X?
    - `ia_program_detail` — tell me about program X?
    - `ia_code_complexity` — complexity hotspots?

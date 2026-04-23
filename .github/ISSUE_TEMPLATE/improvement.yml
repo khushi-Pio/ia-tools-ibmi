@@ -10,7 +10,7 @@ body:
       options:
         - ia_find_object_usages
         - ia_call_hierarchy
-        - ia_field_impact
+        - ia_file_field_impact_analysis
         - ia_program_variables
         - ia_data_structures
         - ia_call_parameters

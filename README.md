@@ -27,7 +27,7 @@ A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to qu
 |---|------|-------------|
 | 1 | `ia_find_object_usages` | Find all objects referencing a given object (filter by type or library) |
 | 2 | `ia_call_hierarchy` | Program call tree (CALLERS/CALLEES/BOTH) |
-| 3 | `ia_field_impact` | Blast radius of changing a field in a file |
+| 3 | `ia_file_field_impact_analysis` | Blast radius of changing a field in a file |
 | 4 | `ia_program_variables` | All variables declared in a program |
 | 5 | `ia_data_structures` | Data structure definitions and subfields |
 | 6 | `ia_call_parameters` | Parameters passed at each external call site |

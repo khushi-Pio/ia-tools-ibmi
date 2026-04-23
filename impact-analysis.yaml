@@ -132,8 +132,8 @@ tools:
       FETCH FIRST :limit ROWS ONLY
 
   # ── 3. Field Impact — blast radius of changing a field ──────────────────
-  ia_field_impact:
-    name: ia-field-impact
+  ia_file_field_impact_analysis:
+    name: ia-file-field-impact-analysis
     source: ibmi
     fetchAllRows: true
     maxDisplayRows: 1000
