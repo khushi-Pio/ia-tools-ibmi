@@ -105,7 +105,7 @@ Call `ia_program_variables` → Group: standalone fields, DS subfields (likely D
 `ia_cl_jobs(call_type="SBMJOB")` → Returns SBMJOB calls with job queue, hold flag → Critical: programs appearing "unused" may be scheduler-invoked → Cross-reference with ia_unused_objects to avoid false positives.
 
 ### P14: "What files does program X use (with prefixes)?"
-`ia_program_files(member_name="ORDENTRY")` → Shows files with PREFIX, RENAME, record format details → More detailed than ia_find_object_usages for understanding file access patterns.
+`ia_program_files(member_name="ORDENTRY", library="AIDEMOLIB")` → Shows files with PREFIX, RENAME, record format details → Use `library` param to scope to a specific library when the same member name exists in multiple libraries → More detailed than ia_find_object_usages for understanding file access patterns.
 
 ### P15: "Scope analysis to a project area"
 `ia_application_area(area_name="*LIST")` → List all defined areas → Then `ia_application_area(area_name="MYPROJECT")` → Returns objects in that area for scoped analysis.

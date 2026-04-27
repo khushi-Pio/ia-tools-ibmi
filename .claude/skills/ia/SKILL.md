@@ -198,13 +198,13 @@ Present as one response with four sections:
 | `ia_member_copybooks` | Copybooks used by a source member |
 | `ia_srvpgm_exports` | Service program exported/imported procedures |
 | `ia_procedure_xref` | Procedure-level cross-reference |
-| `ia_procedure_params` | Procedure PR/PI signatures |
+| `ia_procedure_params` | Procedure PR/PI signatures; filter by `procedure_name`, `member_name`, `library` |
 | `ia_cl_jobs` | CL SBMJOB/CALL detection with job queue info |
 | `ia_variable_ops` | Variable declarations, assignments, BIF usage |
 | `ia_klist_usage` | KLIST/KFLD key list definitions |
 | `ia_application_area` | Scoped project areas and their objects |
 | `ia_sql_names` | SQL long/short name mapping |
-| `ia_program_files` | Program file usage with PREFIX/RENAME |
+| `ia_program_files` | Program file usage with PREFIX/RENAME; filter by `member_name`, `library` |
 
 ### General-Purpose (prefer for >100 rows)
 | Tool | Purpose |

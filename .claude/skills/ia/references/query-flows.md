@@ -185,7 +185,7 @@ Returns: All members including the copybook, with line numbers and member types.
 **Two-query approach:**
 ```
 1. ia_srvpgm_exports(object_name="IASRV01SV", procedure_type="EXPORT") → Exported procedures
-2. ia_procedure_params(procedure_name="<specific>") → Parameter signatures
+2. ia_procedure_params(procedure_name="<specific>", library="AIDEMOLIB") → Parameter signatures
 ```
 
 **Alternative:** For procedure callers, use `ia_procedure_xref(procedure_name="X", direction="CALLERS")`.
@@ -218,9 +218,9 @@ Returns: SBMJOB calls with job name, job queue, hold flag.
 
 **Single query:**
 ```
-ia_program_files(member_name="ORDENTRY", limit=50)
+ia_program_files(member_name="ORDENTRY", library="AIDEMOLIB", limit=50)
 ```
-Returns: Files used with PREFIX, RENAME, record format — more detailed than ia_find_object_usages for file analysis.
+Returns: Files used with PREFIX, RENAME, record format — more detailed than ia_find_object_usages for file analysis. Use `library` to scope when the same member exists in multiple libraries.
 
 ---
 

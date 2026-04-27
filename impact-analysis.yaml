@@ -1482,7 +1482,12 @@ tools:
         maxLength: 256
       - name: member_name
         type: string
-        description: "Filter by source member name (optional)"
+        description: "Filter by source member name (optional, default: *ALL)"
+        required: false
+        default: "*ALL"
+      - name: library
+        type: string
+        description: "Filter by library name (optional, default: *ALL)"
         required: false
         default: "*ALL"
       - name: limit
@@ -1494,6 +1499,7 @@ tools:
         max: 1000
     statement: |
       SELECT
+        LIBRARY_NAME AS library,
         MEMBER_NAME,
         PROCEDURE_NAME,
         PR_PI_FLAG AS declaration_type,
@@ -1506,7 +1512,8 @@ tools:
       FROM ${IA_LIBRARY}.IAPRCPARM
       WHERE PROCEDURE_NAME = :procedure_name
         AND (:member_name = '*ALL' OR MEMBER_NAME = :member_name)
-      ORDER BY MEMBER_NAME, PR_PI_FLAG, PARAMETER_SEQ
+        AND (:library = '*ALL' OR LIBRARY_NAME = :library)
+      ORDER BY LIBRARY_NAME, MEMBER_NAME, PR_PI_FLAG, PARAMETER_SEQ
       FETCH FIRST :limit ROWS ONLY
 
   # ── 36. Variable Operations — assignments, declarations, BIFs ────────────
@@ -1719,6 +1726,11 @@ tools:
         required: true
         minLength: 1
         maxLength: 10
+      - name: library
+        type: string
+        description: "Filter by library name (optional, default: *ALL)"
+        required: false
+        default: "*ALL"
       - name: limit
         type: integer
         description: "Max results (default: 100)"
@@ -1743,6 +1755,7 @@ tools:
         INDICATOR_DATASTR AS indicator_ds
       FROM ${IA_LIBRARY}.PROGRAM_TO_FILE_MAPPING_DETAILS
       WHERE MEMBER_NAME = :member_name
+        AND (:library = '*ALL' OR LIBRARY = :library)
       ORDER BY ACTUAL_FILE
       FETCH FIRST :limit ROWS ONLY
 
