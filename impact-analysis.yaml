@@ -1150,9 +1150,13 @@ tools:
     fetchAllRows: true
     maxDisplayRows: 1000
     description: >
-      Look up an object by name to find its type, library, and attribute.
-      Queries IAOBJMAP (object-to-source mapping table).
-      Supports % wildcards (e.g., %CUST%).
+      Resolve an object name to its type (*PGM, *FILE, *SRVPGM, etc.), owning library,
+      and attribute (RPGLE, LF, PF, etc.). Use this tool first when you need to
+      identify WHAT an object is or WHERE it lives — e.g. "what type is CUSTMAST?",
+      "which library contains ORDRPRC?", or "find all objects matching %CUST%".
+      Distinct from ia_object_lifecycle (which returns dates/usage counts) and
+      ia_object_list (which lists all objects in a library).
+      Supports % wildcards. Queries IAOBJMAP (object-to-source mapping table).
     parameters:
       - name: object_name
         type: string
