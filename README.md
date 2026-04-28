@@ -51,7 +51,7 @@ A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to qu
 | 24 | `ia_override_chain` | Chained OVRDBF dependencies (A→B→C) |
 | 25 | `ia_object_lifecycle` | Creation/change/last-used dates per object |
 | 26 | `ia_code_complexity` | Complexity metrics per source member |
-| 27 | `ia_library_files` | List all files/tables in the iA library |
+| 27 | `ia_library_files` | List all files/tables in any IBM i library (defaults to configured IA_LIBRARY; supports `#` library names) |
 | 28 | `ia_object_lookup` | Look up object type, library, and attribute by name |
 | 29 | `ia_file_dependencies` | Find LFs, indexes, and views dependent on a physical file |
 | 30 | `ia_uncompiled_sources` | Find source members without compiled objects (orphaned sources) |
@@ -67,8 +67,8 @@ A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to qu
 | 34 | `ia_procedure_params` | Get procedure PR/PI parameter signatures |
 | 35 | `ia_cl_jobs` | Detect SBMJOB calls in CL programs |
 | 36 | `ia_variable_ops` | Find variable declarations, assignments, BIFs |
-| 37 | `ia_klist_usage` | Find KLIST/KFLD key list definitions |
-| 38 | `ia_application_area` | List application areas and their objects |
+| 37 | `ia_klist_usage` | Find KLIST/KFLD key list definitions; filter by key field name with `kfld_name` (supports % wildcards) |
+| 38 | `ia_application_area` | List areas/objects (forward) or find which areas contain an object (reverse lookup via `object_name`) |
 | 39 | `ia_sql_names` | Map SQL long names to system short names |
 | 40 | `ia_program_files` | List files used by a program with PREFIX details |
 | 41 | `ia_rpg_source` | Read RPG source code with optional spec-type and member filtering (supports *ALL member) |

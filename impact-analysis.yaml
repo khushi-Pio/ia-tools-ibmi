@@ -1194,12 +1194,18 @@ tools:
     fetchAllRows: true
     maxDisplayRows: 1000
     description: >
-      List all files and tables in the iA repository library.
+      List all files and tables in an IBM i library.
       Shows file name, type (TABLE, VIEW, etc.), last altered date,
       and text description. Use this to discover available files before
-      querying their schema or data.
-      Queries QSYS2.SYSTABLES for the library configured in IA_LIBRARY.
+      querying their schema or data. Defaults to the configured IA_LIBRARY;
+      pass a library name (e.g., #AIDEMO, QSYS) to query any other library.
+      Queries QSYS2.SYSTABLES.
     parameters:
+      - name: library
+        type: string
+        description: "Library name to query (default: uses configured IA_LIBRARY). Pass any IBM i library name, e.g., #AIDEMO or QSYS."
+        required: false
+        default: ""
       - name: file_type
         type: string
         description: "Filter by type: *ALL, TABLE, VIEW, PHYSICAL, LOGICAL (default: *ALL)"
@@ -1219,7 +1225,7 @@ tools:
         TABLE_TEXT AS description,
         LAST_ALTERED_TIMESTAMP AS last_altered
       FROM QSYS2.SYSTABLES
-      WHERE TABLE_SCHEMA = '${IA_LIBRARY}'
+      WHERE TABLE_SCHEMA = CASE WHEN :library = '' THEN '${IA_LIBRARY}' ELSE UPPER(:library) END
         AND (:file_type = '*ALL' OR TABLE_TYPE = :file_type)
       ORDER BY TABLE_NAME
       FETCH FIRST :limit ROWS ONLY
@@ -1679,6 +1685,11 @@ tools:
         description: "Key list name to search for, or *ALL"
         required: false
         default: "*ALL"
+      - name: kfld_name
+        type: string
+        description: "Key field name to filter by, or *ALL. Supports % wildcards (e.g., DB% matches all fields starting with DB)."
+        required: false
+        default: "*ALL"
       - name: limit
         type: integer
         description: "Max results (default: 500)"
@@ -1696,6 +1707,7 @@ tools:
       FROM ${IA_LIBRARY}.IAPGMKLIST
       WHERE (:member_name = '*ALL' OR MEMBER_NAME = :member_name)
         AND (:klist_name = '*ALL' OR KLIST_NAME = :klist_name)
+        AND (:kfld_name = '*ALL' OR RTRIM(KFLD_NAME) LIKE :kfld_name)
       ORDER BY MEMBER_NAME, KLIST_NAME
       FETCH FIRST :limit ROWS ONLY
 
@@ -1707,9 +1719,11 @@ tools:
     maxDisplayRows: 1000
     description: >
       List application areas (named project scopes) and optionally the objects
-      in each area. Use *LIST to see all defined areas, or provide an area name
-      to see its objects. Application areas enable scoped impact analysis —
-      filter queries to a specific project or subsystem.
+      in each area. Supports three modes:
+      (1) *LIST: list all defined areas (no object_name needed);
+      (2) area_name=MYAREA: show all objects in that area;
+      (3) object_name=CUSTMAST: reverse lookup — find which areas contain that object (supports % wildcards).
+      Application areas enable scoped impact analysis — filter queries to a specific project or subsystem.
       Queries APPLICATION_AREA_HEADER and APPLICATION_AREA_OBJECT_DETAILS.
     parameters:
       - name: area_name
@@ -1717,6 +1731,11 @@ tools:
         description: "Application area name, or *LIST to list all areas"
         required: false
         default: "*LIST"
+      - name: object_name
+        type: string
+        description: "Reverse lookup: find which areas contain this object. Supports % wildcards. Use *ALL to skip this filter (default: *ALL)."
+        required: false
+        default: "*ALL"
       - name: object_type
         type: string
         description: "Filter objects by type: *ALL, *PGM, *SRVPGM, *FILE (default: *ALL)"
@@ -1740,8 +1759,9 @@ tools:
       FROM ${IA_LIBRARY}.APPLICATION_AREA_HEADER h
       LEFT JOIN ${IA_LIBRARY}.APPLICATION_AREA_OBJECT_DETAILS d
         ON h.APP_AREA_NAME = d.APP_AREA_NAME
-        AND (:area_name != '*LIST')
+        AND (:area_name != '*LIST' OR :object_name != '*ALL')
       WHERE (:area_name = '*LIST' OR h.APP_AREA_NAME = :area_name)
+        AND (:object_name = '*ALL' OR d.OBJECT_NAME LIKE :object_name)
         AND (:object_type = '*ALL' OR d.OBJECT_TYPE = :object_type OR d.OBJECT_TYPE IS NULL)
       ORDER BY h.APP_AREA_NAME, d.OBJECT_TYPE, d.OBJECT_NAME
       FETCH FIRST :limit ROWS ONLY
