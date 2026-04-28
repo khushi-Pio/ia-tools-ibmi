@@ -311,7 +311,9 @@ tools:
     description: >
       Get parameter details for all external calls made by a program.
       Shows what data is passed to each called program/procedure.
-      Queries IACALLPARM — parameter names, types, and lengths.
+      Queries IACALLPARM — parameter names (PARM_NAME) and call sequence are
+      reliably populated. PARM_TYPE and PARM_LENGTH depend on iA parser version
+      and call type; they may be null for CALL/CALLP statements.
     parameters:
       - name: member_name
         type: string
@@ -761,7 +763,7 @@ tools:
         MBR_BLNK_LOC AS blank_lines
       FROM ${IA_LIBRARY}.IASRCMBRID
       WHERE MEMBER_NAME = :member_name
-      ORDER BY MEMBER_NAME
+      ORDER BY MEMBER_LIB, MBR_SRC_PF
       FETCH FIRST :limit ROWS ONLY
 
    # ── 15. RPG Source Tokens — token-level RPG source analysis ──────────────
@@ -2118,7 +2120,6 @@ tools:
         max: 5000
     statement: |
       SELECT DISTINCT
-        LIBRARY_NAME AS source_library,
         OBJECT_NAME AS source_object,
         OBJECT_TYPE AS source_type,
         OBJECT_ATTR AS source_attr,
