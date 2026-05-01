@@ -19,7 +19,7 @@ Use them with **VS Code GitHub Copilot**, **Claude Code**, or any MCP-compatible
 
 A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to query all 35+ iA tables. Invoke with `/ia` in any Claude Code session. The skill includes table schemas, SQL patterns, and query workflows in its `references/` folder.
 
-## Tools (46 custom + 2 built-in)
+## Tools (45 custom + 2 built-in)
 
 ### Custom iA Tools (defined in `impact-analysis.yaml`)
 
@@ -37,11 +37,10 @@ A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to qu
 | 10 | `ia_object_list` | Repository inventory filtered by object type and attribute |
 | 11 | `ia_program_summary` | Quick program overview with compile info and complexity; supports library filter |
 | 13 | `ia_program_detail` | Deep structural analysis (calls, files, subroutines, variables) |
-| 14 | `ia_source_code` | Source member location and line counts |
 | 15 | `ia_rpg_source_tokens` | Token-level RPG source analysis |
 | 16 | `ia_cl_source_tokens` | Token-level CL source analysis |
 | 17 | `ia_dashboard` | Repository health summary by member category |
-| 18 | `ia_repo_config` | iA repository configuration settings |
+| 18 | `ia_repo_config` | iA repository configuration settings; IAOBJUSGDR = date usage stats were last collected |
 | 19 | `ia_exception_log` | iA parser exception log |
 | 20 | `ia_dds_to_ddl_status` | DDS→DDL conversion tracking |
 | 21 | `ia_reference_count` | Lightweight reference count grouped by type |
@@ -49,7 +48,7 @@ A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to qu
 | 23 | `ia_circular_deps` | Detect circular call chains |
 | 24 | `ia_override_chain` | Chained OVRDBF dependencies (A→B→C) |
 | 25 | `ia_object_lifecycle` | Creation/change/last-used dates per object |
-| 26 | `ia_code_complexity` | Complexity metrics per source member |
+| 26 | `ia_code_complexity` | Complexity metrics per source member; includes library column and library filter |
 | 27 | `ia_library_files` | List all files/tables in any IBM i library (defaults to configured IA_LIBRARY; supports `#` library names) |
 | 28 | `ia_object_lookup` | Look up object type, library, and attribute by name |
 | 29 | `ia_file_dependencies` | Find LFs, indexes, and views dependent on a physical file |
@@ -65,15 +64,15 @@ A token-efficient skill at `.claude/skills/ia/` that teaches AI agents how to qu
 | 33 | `ia_procedure_xref` | Procedure-level cross-reference (callers/callees) |
 | 34 | `ia_procedure_params` | Get procedure PR/PI parameter signatures |
 | 35 | `ia_cl_jobs` | Detect SBMJOB calls in CL programs |
-| 36 | `ia_variable_ops` | Find variable declarations, assignments, BIFs |
+| 36 | `ia_variable_ops` | Find variable declarations, assignments, BIFs; supports cross-member opcode search (e.g., all members using CLEAR) |
 | 37 | `ia_klist_usage` | Find KLIST/KFLD key list definitions; filter by key field name with `kfld_name` (supports % wildcards) |
 | 38 | `ia_application_area` | List areas/objects (forward) or find which areas contain an object (reverse lookup via `object_name`) |
 | 39 | `ia_sql_names` | Map SQL long names to system short names |
 | 40 | `ia_program_files` | List files used by a program with PREFIX details |
 | 41 | `ia_rpg_source` | Read RPG source code with optional spec-type and member filtering (supports *ALL member) |
 | 42 | `ia_rpg_source_search` | Search RPG source across members for keywords |
-| 43 | `ia_rpg_source_stats` | Modernization stats: free-format vs fixed-format, comment ratio |
-| 44 | `ia_member_lookup` | Look up source member metadata and verify existence |
+| 43 | `ia_rpg_source_stats` | Modernization stats: free-format vs fixed-format, comment and blank line counts |
+| 44 | `ia_member_lookup` | Look up source member metadata, verify existence, and view line counts (supersedes ia_source_code) |
 | 45 | `ia_object_references` | Find what an object references/contains; filter by source object type to disambiguate *PGM vs *SRVPGM |
 | 47 | `ia_obj_size` | Object size and usage metrics — lookup a specific object or rank the largest / unused objects |
 

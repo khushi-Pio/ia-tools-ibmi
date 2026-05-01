@@ -148,7 +148,7 @@ Call `ia_program_variables` → Group: standalone fields, DS subfields (likely D
 1. **One query is usually enough.** Before calling a second tool, ask: "Can I answer this from results I already have?"
 2. **Use `ia_program_detail` for program anatomy.** It returns calls, files, subroutines, variables, overrides, and call parameters in ONE query — no need for 6 separate calls.
 3. **Don't chain redundantly.** `ia_find_object_usages` already gives you everything; don't follow up with `ia_reference_count` on the same object.
-4. **Skip intermediate steps.** Don't call `ia_source_code` before `ia_rpg_source_tokens` — go straight to the token analysis.
+4. **Skip intermediate steps.** Don't call `ia_member_lookup` just to get location before `ia_rpg_source_tokens` — go straight to the token analysis.
 5. **Batch your thinking.** If results show 5 SRVPGMs, don't call `ia_find_object_usages` on each one individually — ask the user which ones matter first.
 6. **Respect the 80/20 rule.** 80% of user questions can be answered with these tools in 1 call:
    - `ia_find_object_usages` — what uses X?

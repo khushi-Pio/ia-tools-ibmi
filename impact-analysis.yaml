@@ -700,44 +700,6 @@ tools:
       ORDER BY section, name
       FETCH FIRST :limit ROWS ONLY
 
-  # ── 14. Source Code — source member location ──────────────────────────────
-  ia_source_code:
-    name: ia-source-code
-    source: ibmi
-    fetchAllRows: true
-    maxDisplayRows: 1000
-    description: >
-      Get source member location and metadata from IASRCMBRID. Returns the
-      source file, library, member type, and line counts. Use this to find
-      where source code is stored before accessing it directly.
-    parameters:
-      - name: member_name
-        type: string
-        description: "Source member name (max 10)"
-        required: true
-        minLength: 1
-        maxLength: 10
-      - name: limit
-        type: integer
-        description: "Max results (default: 100)"
-        required: false
-        default: 100
-        min: 1
-        max: 1000
-    statement: |
-      SELECT
-        MEMBER_NAME,
-        MBR_SRC_PF AS source_file,
-        MEMBER_LIB AS source_library,
-        MEMBER_TYPE,
-        MBR_TTL_LOC AS total_lines,
-        MBR_CMT_LOC AS comment_lines,
-        MBR_BLNK_LOC AS blank_lines
-      FROM ${IA_LIBRARY}.IASRCMBRID
-      WHERE MEMBER_NAME = :member_name
-      ORDER BY MEMBER_LIB, MBR_SRC_PF
-      FETCH FIRST :limit ROWS ONLY
-
    # ── 15. RPG Source Tokens — token-level RPG source analysis ──────────────
   ia_rpg_source_tokens:
     name: ia-rpg-source-tokens
@@ -847,8 +809,9 @@ tools:
     fetchAllRows: true
     maxDisplayRows: 1000
     description: >
-      Get the iA repository configuration settings (IFS locations, scan options, etc.).
-      Queries REPO_CONFIGURATION.
+      Get iA repository configuration settings. KEY_NAME1=IAOBJUSGDR means the date object
+      usage statistics were last collected — use this to assess freshness of ia_obj_size,
+      ia_object_lifecycle, and ia_unused_objects results. Queries REPO_CONFIGURATION.
     parameters:
       - name: limit
         type: integer
@@ -858,7 +821,13 @@ tools:
         min: 1
         max: 1000
     statement: |
-      SELECT KEY_NAME1, KEY_VALUE1
+      SELECT
+        KEY_NAME1, KEY_NAME2,
+        KEY_VALUE1, VAL1_DESCRIPTION,
+        KEY_VALUE2, VAL2_DESCRIPTION,
+        KEY_VALUE3, VAL3_DESCRIPTION,
+        CRT_USR_NAME, CRT_TIMESTAMP,
+        UPD_USR_NAME, UPD_TIMESTAMP
       FROM ${IA_LIBRARY}.REPO_CONFIGURATION
       FETCH FIRST :limit ROWS ONLY
 
@@ -1114,11 +1083,18 @@ tools:
       Code complexity metrics per source member — IF/DO/SQL/GOTO/PROC counts,
       total and executable line counts, and call statistics. Use to identify the
       most complex, risky programs that need refactoring or extra testing.
+      Supports library filter when the same member exists in multiple libraries.
       Queries IA_CODE_INFO.
     parameters:
       - name: member_name
         type: string
         description: "Source member name (e.g., IASRV01SV). Use '*ALL' to list all members."
+        required: false
+        default: "*ALL"
+        maxLength: 10
+      - name: library
+        type: string
+        description: "Filter by library name, or *ALL (default: *ALL)"
         required: false
         default: "*ALL"
         maxLength: 10
@@ -1131,6 +1107,7 @@ tools:
         max: 5000
     statement: |
       SELECT
+        LIBRARY_NAME,
         MEMBER_NAME,
         MEMBER_TYPE,
         SOURCE_FORMAT,
@@ -1158,7 +1135,8 @@ tools:
         ALL_COUNT AS total_operations
       FROM ${IA_LIBRARY}.IA_CODE_INFO
       WHERE (:member_name = '*ALL' OR MEMBER_NAME = :member_name)
-      ORDER BY TOTAL_LINES DESC
+        AND (:library = '*ALL' OR LIBRARY_NAME = :library)
+      ORDER BY LIBRARY_NAME, TOTAL_LINES DESC
       FETCH FIRST :limit ROWS ONLY
 
   # ── 27. Library Files — list all files/tables in the iA library ──────────
@@ -1585,15 +1563,15 @@ tools:
     maxDisplayRows: 1000
     description: >
       Find all operations involving a variable — declarations (DCL-DS, DCLVAR),
-      assignments (= operator), comparisons, and BIF usage. Useful for tracing data
-      flow and understanding how a variable is used throughout a program.
+      assignments (= operator), comparisons, and BIF usage. Omit member_name (or pass *ALL)
+      to search across all members for a specific opcode (e.g., find all members using CLEAR).
       Queries IAVARREL.
     parameters:
       - name: member_name
         type: string
-        description: "Source member name"
-        required: true
-        minLength: 1
+        description: "Source member name, or *ALL for cross-member opcode/variable search (default: *ALL)"
+        required: false
+        default: "*ALL"
         maxLength: 10
       - name: variable_name
         type: string
@@ -1627,7 +1605,7 @@ tools:
         RESULT_VAL AS result,
         BIF AS builtin_function
       FROM ${IA_LIBRARY}.IAVARREL
-      WHERE MEMBER_NAME = :member_name
+      WHERE (:member_name = '*ALL' OR MEMBER_NAME = :member_name)
         AND (:variable_name = '*ALL'
              OR FACTOR1_VAL = :variable_name
              OR FACTOR2_VAL = :variable_name
@@ -1958,7 +1936,7 @@ tools:
       in multiple libraries, each library appears as a separate row for cross-library
       comparison. Run with member_name=*ALL for a full portfolio modernization dashboard.
       Queries IAQRPGSRC. SRCLIN_TYPE codes: FFR/FFC = free-format code, FX3/FX4 = fixed-format
-      code, 4-char types (FFRC, FX3C, etc.) = comments/templates.
+      code, types ending in C (FFRC, FX3C, FX4C, FFCC) = comment lines, blank SRCLIN_TYPE = blank lines.
     parameters:
       - name: member_name
         type: string
@@ -1985,7 +1963,8 @@ tools:
         COUNT(*) AS TOTAL_LINES,
         SUM(CASE WHEN SRCLIN_TYPE LIKE 'FF%' THEN 1 ELSE 0 END) AS FREE_FORMAT_LINES,
         SUM(CASE WHEN SRCLIN_TYPE LIKE 'FX%' THEN 1 ELSE 0 END) AS FIXED_FORMAT_LINES,
-        SUM(CASE WHEN SRCLIN_TYPE IN ('FFR', 'FFC', 'FX3', 'FX4') THEN 0 ELSE 1 END) AS COMMENT_LINES,
+        SUM(CASE WHEN RTRIM(SRCLIN_TYPE) LIKE '%C' THEN 1 ELSE 0 END) AS COMMENT_LINES,
+        SUM(CASE WHEN TRIM(SRCLIN_TYPE) = '' THEN 1 ELSE 0 END) AS BLANK_LINES,
         SUM(CASE WHEN SRCLIN_TYPE IN ('FFR', 'FFC', 'FX3', 'FX4') THEN 1 ELSE 0 END) AS CODE_LINES,
         CASE WHEN COUNT(*) > 0
           THEN DEC(SUM(CASE WHEN SRCLIN_TYPE LIKE 'FF%' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 5, 1)
@@ -2005,9 +1984,10 @@ tools:
     maxDisplayRows: 1000
     description: >
       Look up source member metadata: file location, type, description, record counts,
-      and creation/change/usage timestamps. Use this to verify member existence before
-      querying other tools, or to get member details. Supports % wildcards.
-      Queries IAMEMBER (member list details table).
+      creation/change/usage timestamps, and line counts (total/comment/blank).
+      Use this to verify member existence before querying other tools, or to get member details.
+      Supersedes ia_source_code. Supports % wildcards.
+      Queries IAMEMBER joined with IASRCMBRID.
     parameters:
       - name: member_name
         type: string
@@ -2042,21 +2022,28 @@ tools:
         max: 5000
     statement: |
       SELECT
-        MEMBER_NAME, SOURCE_FILE, SOURCE_LIBRARY, IFS_LOCATION,
-        MEMBER_TYPE, MEMBER_TYPE_S38, MBR_DESCRIPTION,
-        NUMBER_OF_RECORD, NUMBER_OF_DELETED_RECORD,
-        MBR_CREATION_CENTURY || MBR_CREATION_DATE AS CREATED_DATE,
-        MBR_CREATION_TIME AS CREATED_TIME,
-        MBR_CHANGED_CENTURY || MBR_CHANGED_DATE AS CHANGED_DATE,
-        MBR_CHANGED_TIME AS CHANGED_TIME,
-        LAST_USED_CENTURY || LAST_USED_DATE AS LAST_USED_DATE,
-        DAYS_USED_COUNT
-      FROM ${IA_LIBRARY}.IAMEMBER
-      WHERE MEMBER_NAME LIKE :member_name
-        AND (:source_file = '*ALL' OR SOURCE_FILE = :source_file)
-        AND (:source_library = '*ALL' OR SOURCE_LIBRARY = :source_library)
-        AND (:member_type = '*ALL' OR RTRIM(MEMBER_TYPE) LIKE :member_type)
-      ORDER BY MEMBER_NAME, SOURCE_LIBRARY, SOURCE_FILE
+        M.MEMBER_NAME, M.SOURCE_FILE, M.SOURCE_LIBRARY, M.IFS_LOCATION,
+        M.MEMBER_TYPE, M.MEMBER_TYPE_S38, M.MBR_DESCRIPTION,
+        M.NUMBER_OF_RECORD, M.NUMBER_OF_DELETED_RECORD,
+        M.MBR_CREATION_CENTURY || M.MBR_CREATION_DATE AS CREATED_DATE,
+        M.MBR_CREATION_TIME AS CREATED_TIME,
+        M.MBR_CHANGED_CENTURY || M.MBR_CHANGED_DATE AS CHANGED_DATE,
+        M.MBR_CHANGED_TIME AS CHANGED_TIME,
+        M.LAST_USED_CENTURY || M.LAST_USED_DATE AS LAST_USED_DATE,
+        M.DAYS_USED_COUNT,
+        S.MBR_TTL_LOC AS total_lines,
+        S.MBR_CMT_LOC AS comment_lines,
+        S.MBR_BLNK_LOC AS blank_lines
+      FROM ${IA_LIBRARY}.IAMEMBER M
+      LEFT JOIN ${IA_LIBRARY}.IASRCMBRID S
+        ON S.MEMBER_NAME = M.MEMBER_NAME
+        AND S.MEMBER_LIB = M.SOURCE_LIBRARY
+        AND S.MBR_SRC_PF = M.SOURCE_FILE
+      WHERE M.MEMBER_NAME LIKE :member_name
+        AND (:source_file = '*ALL' OR M.SOURCE_FILE = :source_file)
+        AND (:source_library = '*ALL' OR M.SOURCE_LIBRARY = :source_library)
+        AND (:member_type = '*ALL' OR RTRIM(M.MEMBER_TYPE) LIKE :member_type)
+      ORDER BY M.MEMBER_NAME, M.SOURCE_LIBRARY, M.SOURCE_FILE
       FETCH FIRST :limit ROWS ONLY
 
   # ── 45. Object References — what an object references/contains ────────────

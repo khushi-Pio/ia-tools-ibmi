@@ -20,7 +20,6 @@ body:
         - ia_object_list
         - ia_program_summary
         - ia_program_detail
-        - ia_source_code
         - ia_rpg_source_tokens
         - ia_cl_source_tokens
         - ia_dashboard

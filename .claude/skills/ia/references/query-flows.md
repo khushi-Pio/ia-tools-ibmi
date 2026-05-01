@@ -305,7 +305,7 @@ execute_sql → SQL with SOURCE_SPEC filter (P=procedures, D=definitions, F=file
 1. ia_cl_source_tokens(member_name="RUNJOB", limit=500)
 ```
 
-**Skip** `ia_source_code` — it only returns location metadata, not the actual tokens.
+**Skip** `ia_member_lookup` just to get location — go straight to the token analysis.
 
 ---
 
@@ -412,7 +412,7 @@ User Question
 | Bad Pattern | Why It's Bad | Better Approach |
 |-------------|--------------|-----------------|
 | `ia_find_object_usages` then `ia_reference_count` on same object | Redundant — just count the where_used results | Use only `ia_find_object_usages` |
-| `ia_source_code` before `ia_rpg_source_tokens` | source_code only returns location, not content | Go straight to `ia_rpg_source_tokens` |
+| `ia_member_lookup` just for location before `ia_rpg_source_tokens` | only returns location metadata, not content | Go straight to `ia_rpg_source_tokens` |
 | `ia_program_summary` + `ia_program_variables` + `ia_subroutines` | Three queries for one program | Use `ia_program_detail section=*ALL` |
 | `ia_object_lifecycle` for every unused object | Unnecessary — unused_objects already confirms zero refs | Only check lifecycle for specific objects |
 | Chaining to `ia_call_hierarchy` for every *PGM result | Overkill — most programs don't need deep analysis | Only chain for *SRVPGM or critical programs |
